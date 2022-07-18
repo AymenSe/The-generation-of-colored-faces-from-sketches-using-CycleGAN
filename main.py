@@ -106,7 +106,9 @@ def main():
         config=config)
     
     trainer.train(dataloader, test_dataloader, START_EPOCH, d_scaler, g_scaler)
-
+    
+    # Visualize losses
+    vis_losses(ROOT)
 
 
 if __name__ == '__main__':
