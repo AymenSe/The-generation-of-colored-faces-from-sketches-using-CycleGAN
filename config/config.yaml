@@ -1,0 +1,13 @@
+folder_to_save_trained: "./saved"
+LAMBDA_CYCLE: 10.0
+LAMBDA_IDT: 0.2
+print_every: 5
+ROOT: "./"
+EPOCHS: 300
+SAVE_MODEL: True
+LEARNING_RATE: 2e-4
+BATCH_SIZE: 1
+START_EPOCH: 0
+LOAD_PATH: None
+DATA_PATH: "./CUHK"
+NUM_WORKERS: 2

@@ -24,15 +24,15 @@ class CycleGANTrainer:
         self.LAMBDA_CYCLE = params["LAMBDA_CYCLE"]
         self.LAMBDA_IDT = params["LAMBDA_IDT"]
         self.print_every = params["print_every"]
-        self.root = params["root"]
-        self.epochs = params["epochs"]
+        self.ROOT = params["ROOT"]
+        self.EPOCHS = params["EPOCHS"]
         self.SAVE_MODEL = params["SAVE_MODEL"]
 
 
 
     def train(self, dataloader, start_epoch, d_scaler, g_scaler):
         """
-        Train the model for a given number of self.epochs.
+        Train the model for a given number of self.EPOCHS.
         Args:
             dataloader: Dataloader for the training set.
             start_epoch: Epoch to start training from.
@@ -45,14 +45,14 @@ class CycleGANTrainer:
         self.discA.train()
         self.discB.train()
 
-        with open(self.root+"/gen_loss.json", 'r') as g_l:
+        with open(self.ROOT+"/gen_loss.json", 'r') as g_l:
             gen_loss_arr = json.load(g_l)
     
-        with open(self.root+"/disc_loss.json", 'r') as d_l:
+        with open(self.ROOT+"/disc_loss.json", 'r') as d_l:
             disc_loss_arr = json.load(d_l)
 
         
-        for epoch in range(start_epoch, self.epochs + start_epoch):
+        for epoch in range(start_epoch, self.EPOCHS + start_epoch):
             
 
             loop = tqdm(dataloader, leave=True)
@@ -130,25 +130,25 @@ class CycleGANTrainer:
             # Print the log info
             if epoch % self.print_every == 0:
                 print('Epoch [{:5d}/{:5d}] | disc_loss: {:6.4f} | gen_loss: {:6.4f}'.format(
-                    epoch, self.epochs + start_epoch, disc_loss.item(), gen_loss.item()))
+                    epoch, self.EPOCHS + start_epoch, disc_loss.item(), gen_loss.item()))
             
             if self.SAVE_MODEL:
-                CHECKPOINT_GEN_SKETCH = os.path.join(self.root, f"epoch_{epoch}/cp/gen_sketch.pth.tar")
-                CHECKPOINT_GEN_PHOTO = os.path.join(self.root, f"epoch_{epoch}/cp/gen_photo.pth.tar")
-                CHECKPOINT_DISC_SKETCH = os.path.join(self.root, f"epoch_{epoch}/cp/disc_sketch.pth.tar")
-                CHECKPOINT_DISC_PHOTO = os.path.join(self.root, f"epoch_{epoch}/cp/disc_photo.pth.tar")
+                CHECKPOINT_GEN_SKETCH = os.path.join(self.ROOT, f"epoch_{epoch}/cp/gen_sketch.pth.tar")
+                CHECKPOINT_GEN_PHOTO = os.path.join(self.ROOT, f"epoch_{epoch}/cp/gen_photo.pth.tar")
+                CHECKPOINT_DISC_SKETCH = os.path.join(self.ROOT, f"epoch_{epoch}/cp/disc_sketch.pth.tar")
+                CHECKPOINT_DISC_PHOTO = os.path.join(self.ROOT, f"epoch_{epoch}/cp/disc_photo.pth.tar")
 
                 save_checkpoint(self.genAtoB, self.opt_gen, filename=CHECKPOINT_GEN_SKETCH)
                 save_checkpoint(self.genBtoA, self.opt_gen, filename=CHECKPOINT_GEN_PHOTO)
                 save_checkpoint(self.discB, self.opt_disc, filename=CHECKPOINT_DISC_SKETCH)
                 save_checkpoint(self.discA, self.opt_disc, filename=CHECKPOINT_DISC_PHOTO)
             
-            with open(self.root+"/gen_loss.json", 'w') as g_l:
+            with open(self.ROOT+"/gen_loss.json", 'w') as g_l:
                 # indent=2 is not needed but makes the file human-readable
                 json.dump(gen_loss_arr, g_l, indent=2)
                 # print("done")
             # print("between!")
-            with open(self.root+"/disc_loss.json", 'w') as d_l:
+            with open(self.ROOT+"/disc_loss.json", 'w') as d_l:
                 # indent=2 is not needed but makes the file human-readable
                 json.dump(disc_loss_arr, d_l, indent=2)
 
@@ -166,7 +166,7 @@ class CycleGANTrainer:
                 rec_photo = self.genBtoA(fake_sketch)
                 rec_sketch = self.genAtoB(fake_photo)
 
-                metrics(photo, sketch, fake_sketch, fake_photo, rec_photo, rec_sketch, self.root, epoch)
+                metrics(photo, sketch, fake_sketch, fake_photo, rec_photo, rec_sketch, self.ROOT, epoch)
                 
                 # save images
                 if idx % 5 == 0:
